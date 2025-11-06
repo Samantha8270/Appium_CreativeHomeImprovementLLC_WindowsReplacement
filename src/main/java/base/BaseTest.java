@@ -68,11 +68,17 @@ public class BaseTest extends SeleniumHelper {
 		initiatePages();
 		
 	}
+	public void startDriver() {
+		DriverManager.initiateDriver( "OPPO RENO NAPA",  "72266245408994");
+		driver = DriverManager.getDriver();
+		SeleniumHelper.driver = driver;
+		initiatePages();
+	}
 	
 	@AfterMethod
 	public void afterMethod() {
 		System.out.println("Quiting driver: " + driver);
-		//driver.quit();
+		driver.quit();
 	}
 	
 	@DataProvider

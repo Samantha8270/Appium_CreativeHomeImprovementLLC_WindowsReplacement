@@ -1,6 +1,7 @@
 package pages;
 
 import java.security.PublicKey;
+import java.util.Random;
 
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
@@ -26,6 +27,9 @@ public class ChromeBrowserPage extends BasePage {
 
 	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/androidx.viewpager.widget.ViewPager/androidx.recyclerview.widget.RecyclerView/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.FrameLayout/android.widget.Button")
 	private WebElement acceptAndContinueBtn;
+	
+	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/androidx.viewpager.widget.ViewPager/androidx.recyclerview.widget.RecyclerView/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.Button[2]")
+	private WebElement useWithoutAnAccount;
 
 	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/androidx.viewpager.widget.ViewPager/androidx.recyclerview.widget.RecyclerView/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.Button[1]")
 	private WebElement noThanksBtn;
@@ -72,10 +76,10 @@ public class ChromeBrowserPage extends BasePage {
 	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.Button")
 	private WebElement closeAllAppsBtn;
 	
-	@FindBy(xpath = "//android.widget.ImageButton[@content-desc=\"1 open tab, tap to switch tabs\"]")
+	@FindBy(xpath = "//android.widget.ImageButton[@content-desc=\"Switch or close tabs\"]")
 	private WebElement openTabsBtn;
 	
-	@FindBy(xpath = "//android.widget.ImageButton[@content-desc=\"More options\"]")
+	@FindBy(xpath = "//android.widget.ImageButton[@content-desc=\"Customize and control Google Chrome\"]")
 	private WebElement openTabOption;
 	
 	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"Close all tabs\"]")
@@ -93,6 +97,8 @@ public class ChromeBrowserPage extends BasePage {
 	@FindBy(xpath = "//android.widget.FrameLayout[@content-desc=\"Enter compass mode\"]/android.widget.FrameLayout/android.widget.FrameLayout[2]/android.widget.ImageView")
 	private WebElement compassBtn;
 	
+	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout[1]/android.widget.FrameLayout[2]/android.webkit.WebView/android.view.View/android.widget.TextView")
+	private WebElement moveToTop;
 	
 	public void openChromeBrowser() {
 		try {
@@ -182,6 +188,17 @@ public class ChromeBrowserPage extends BasePage {
 		waitForElement(recentTabsBtn);
 		recentTabsBtn.click();
 	}
+	public void useWithoutAnAccount() {
+		try {
+			if(useWithoutAnAccount.isDisplayed()) {
+		        waitForElement(useWithoutAnAccount);
+		        useWithoutAnAccount.click();
+			}
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("Not displayed Use without an account");
+		}
+	}
 
 	public void closeAllApps() {
 		pressKeyboardKey(AndroidKey.APP_SWITCH);
@@ -196,20 +213,95 @@ public class ChromeBrowserPage extends BasePage {
 	public void closeAllTabInBrowser() {
 		waitForElement(openTabsBtn);
 		openTabsBtn.click();
+		sleep(3);
 		waitForElement(openTabOption);
 		openTabOption.click();
 		waitForElement(closeAllTabBtn);
 		closeAllTabBtn.click();
-//		waitForElement(closedTab);
-//		closedTab.click();
+		waitForElement(closedTab);
+		closedTab.click();
 	}
+	public void clearBrowserData() {
+		sleep(2);
+		tap(450, 72);
+		System.out.println("click on browser settings");
+		sleep(4);
+		tap(270, 345);
+		System.out.println("clicked on clear browser data and cache");
+		sleep(4);
+		tap(378, 727);
+		System.out.println("All data and cache cleared");
+		sleep(2);
+	}
+	public void exicuteRandomMethod() {
+		Random rand = new Random();
+		int randomNumber = rand.nextInt(5) + 1;
+
+        // Depending on the random number, call the corresponding method
+        switch (randomNumber) {
+            case 1:
+            	tapOnblog();
+                break;
+            case 2:
+            	tapOnDraperies();
+                break;
+            case 3:
+            	tapOnShadesAndBlinds();
+                break;
+            case 4:
+            	tapOnMotorization();
+                break;
+            case 5:
+            	tapOnHunterDouglas();
+                break;
+            default:
+                System.out.println("Invalid random number generated.");
+                break;
+        }
+	}
+	public void tapOnblog() {
+		sleep(2);
+		tap(84, 261);
+		System.out.println("Clicked on blog");
+	}
+	public void tapOnDraperies() {
+		sleep(2);
+		tap(112, 323);
+		System.out.println("clicked on Draperies");
+	}
+	public void tapOnShadesAndBlinds() {
+		sleep(2);
+		tap(136, 393);
+		System.out.println("Clicked on Shades and Blinds");
+	}
+	public void tapOnMotorization() {
+		sleep(2);
+		tap(114, 450);
+		System.out.println("Clicked on Motorization");
+	}
+	public void tapOnHunterDouglas() {
+		sleep(2);
+		tap(114, 670);
+		System.out.println("Clicked on Hunter douglas");
+	}
+	public void moveToTopView() {
+		waitForElement(moveToTop);
+		moveToTop.click();
+		System.out.println("We are in top");
+	}
+	public void pageMenuOption() {
+		sleep(2);
+		tap(426, 217);
+		System.out.println("Page menu option opened");
+	}
+	
 	 public void scrollForTimeInTouchAction(WebDriver driver,int durationInSeconds) {
 		 try {
 	    while(!pageNotFoundLink.isDisplayed()) {
 	    	long startTime = System.currentTimeMillis();
  	        long endTime =  (startTime + (durationInSeconds * 1000));
  	          while (System.currentTimeMillis() < endTime) {
- 	    	   sleep(2);
+ 	    	   sleep(1);
  	    	     scrollInTouchAction(driver);
  	    }
 	    	}

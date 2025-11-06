@@ -16,10 +16,10 @@ public class GoogleMapTestCaseTest extends BaseTest {
 	  String keyWord;
 	  String shopName;
 	  int scrollCount;
-	  double pointALatitude;
-	  double pointALongitude;
+	  double shopLatitude;
+	  double shopLongitude;
 	  double pointBLatitude;
-	  double pointBLongitude;
+	  int miles;
 	  int scrollTimeStart;
 	  int scrollTimeEnd;
 	  long startTime;
@@ -44,6 +44,8 @@ public class GoogleMapTestCaseTest extends BaseTest {
 	            int passCount = 0;
 	            int failCount = 0;
 	            System.out.println(deviceName+udid);
+	            //startAppium();
+	            //sleep(5);
 	            
 
 	    	  exicutionCount++;
@@ -56,32 +58,53 @@ public class GoogleMapTestCaseTest extends BaseTest {
 //    	          System.out.println("Total Exicution ___"+exicutionCount);
 //    			  break;
 //    		  }  
-    	  Sheet sheet = getExcelSheet("Resources/GoogleMapTestData.xlsx", "Sheet3");
-    	  for (int i = 1; i <sheet.getLastRowNum(); i++) {
-    		 
+    	  Sheet sheet = getExcelSheet("Resources/GoogleMapTestData.xlsx", "Sheet9");
+    	  System.out.println("Sheet = "+sheet);
+    	  System.out.println("sheet2");
+    	  for (int i = 1; i <=sheet.getLastRowNum(); i++) {
+    		  
+    		  		//startAppiumServer();
+    		  		//executeCommand("appium server  -p 4723 -a 127.0.0.1 -pa /wd/hub");//
+    		      //  
     		        beforeMethod( deviceName,  udid);
+    		        System.out.println("Google Map");
+    		        
+    		        //////////////////
     		        
                     row = sheet.getRow(i);
-                    keyWord = row.getCell(4).getStringCellValue();
-                    shopName = row.getCell(6).getStringCellValue();
-                    scrollCount = (int) row.getCell(5).getNumericCellValue();
-                    pointALatitude = row.getCell(0).getNumericCellValue();
-                    pointALongitude = row.getCell(1).getNumericCellValue();
-                    pointBLatitude = row.getCell(2).getNumericCellValue();
-                    pointBLongitude = row.getCell(3).getNumericCellValue();
-                    scrollTimeStart =  (int) row.getCell(7).getNumericCellValue();
-                    scrollTimeEnd = (int) row.getCell(8).getNumericCellValue();
+                    keyWord = row.getCell(3).getStringCellValue();
+                    shopName = row.getCell(5).getStringCellValue();
+                    scrollCount = (int) row.getCell(4).getNumericCellValue();
+                    shopLatitude = row.getCell(0).getNumericCellValue();
+                    shopLongitude = row.getCell(1).getNumericCellValue();
+                    //pointBLatitude = row.getCell(2).getNumericCellValue();
+                    miles = (int) row.getCell(2).getNumericCellValue();
+                    scrollTimeStart =  (int) row.getCell(6).getNumericCellValue();
+                    scrollTimeEnd = (int) row.getCell(7).getNumericCellValue();
  
+                    String url = "https://httpbin.org/user-agent";
                     
+                    // startDriver();
                     
                     //Network Reset
-                    toogleFlightMode();
+                      toogleFlightMode();
+                      sendRequestWithDynamicUserAgent(url, true);
+//      	            connectWifi();
+//      	            driver.quit();
+//      	            sleep(3);
+//      	            
+//      	            beforeMethod( deviceName,  udid);
          
            	     //Change Location
+                   double[] randomLocation = generateRandomLocation(shopLatitude, shopLongitude, miles);
+                    
+                    
+                    changeLocation(randomLocation[0], randomLocation[1], 0);  
            	        //sleep(1);
                     //driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-                    changeLocation(generateRandomLatitudeFormP_AToPoint_B(pointALatitude, pointBLatitude),generateRandomLatitudeFormP_AToPoint_B(pointALongitude, pointBLongitude), 0);
+                   // changeLocation(generateRandomLatitudeFormP_AToPoint_B(pointALatitude, pointBLatitude),generateRandomLatitudeFormP_AToPoint_B(pointALongitude, pointBLongitude), 0);
                     //sleep(2);
+                    
                     
            	        //keyword search
                     driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -94,42 +117,63 @@ public class GoogleMapTestCaseTest extends BaseTest {
                     
                     //Sorting with distance
                     //googleMapPage.chnageToDistance();
-                    sleep(4);
+                    //sleep(2);
                     //Scroll to find shop name
+                    googleMapPage.scrollDownIfSponseredComes();
+                    googleMapPage.scrollDownIfSponseredComes();
+                    googleMapPage.scrollDownIfSponseredComes();
                     googleMapPage.moveToShopName(driver, shopName,scrollCount );
                     System.out.println("Shop Name --"+shopName+"Scroll Count--"+scrollCount);
                    
-                    
+                    chromeBrowserPage.scrollForTimeInTouchAction(driver, generateRndmNumber(scrollTimeStart, scrollTimeEnd));
+                    googleMapPage.executeClickSession(driver, generateRndmNumber(scrollTimeStart, scrollTimeEnd));
+                    googleMapPage.ClickonOverview();
                     //Navigate to Shop GMB
-        	        googleMapPage.clickOnShopUrl();
-        	        System.out.println("Navigate to Shop GMB");
+                    String result = googleMapPage.getYesOrNo();
+                    if (result.equals("yes")) {
+                    	System.out.println("Deided to click the URl");
+                        //performAction();
+                    	googleMapPage.clickOnShopUrl();
+                    	for(int j = 8; j <=row.getLastCellNum()-1 ; j++) {
+            	        	System.out.println("In 2nd loop");
+            	        	driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+//            	        	chromeBrowserPage.useWithoutAnAccount();
+            	        	sleep(1);
+            	        	//chromeBrowserPage.scrollForTimeInTouchAction(driver, generateRndmNumber(scrollTimeStart, scrollTimeEnd));
+            	        	//scrollForDurationInSeconds(driver, generateRndmNumber(scrollTimeStart, scrollTimeEnd));
+            	        	//scrollForTimeInTouchAction(driver,generateRndmNumber(scrollTimeStart, scrollTimeEnd));
+            	        	scrollForTime(generateRndmNumber(scrollTimeStart, scrollTimeEnd));
+    	        		    scrollInTouchActionToTheTop(driver);
+////    	        		    chromeBrowserPage.moveToTopView();
+////    	        		    chromeBrowserPage.pageMenuOption();
+////    	        		    chromeBrowserPage.exicuteRandomMethod();
+    	        		    sleep(1);
+    	        		    chromeBrowserPage.scrollForTimeInTouchAction(driver, generateRndmNumber(scrollTimeStart, scrollTimeEnd));
+    	        		    scrollInTouchActionToTheTop(driver);
+    	        		    //googleMapPage.sendTextToUrlSearchBox((row.getCell(j).getStringCellValue()));
+    	        		    System.out.println((row.getCell(j).getStringCellValue()));
+    	        		    System.out.println(j);
+//    	        		    
+//    	        		    //Scroll the pages
+    	        		    scrollInTouchActionToTheTop(driver);
+//    	        		    
+//    	        		    
+            	     }
+                    }
+//      	            googleMapPage.clickOnShopUrl();
+//        	        System.out.println("Navigate to Shop GMB");
         	        
         	        //Navigate different pages from xls file
-        	        for(int j = 9; j <=row.getLastCellNum()-1 ; j++) {
-        	        	driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        	        	sleep(2);
-        	        	chromeBrowserPage.scrollForTimeInTouchAction(driver, generateRndmNumber(scrollTimeStart, scrollTimeEnd));
-        	        	//scrollForDurationInSeconds(driver, generateRndmNumber(scrollTimeStart, scrollTimeEnd));
-        	        	//scrollForTimeInTouchAction(driver,generateRndmNumber(scrollTimeStart, scrollTimeEnd));
-        	        	//scrollForTime(generateRndmNumber(scrollTimeStart, scrollTimeEnd));
-	        		    scrollInTouchActionToTheTop(driver);
-	        		    sleep(2);
-	        		    googleMapPage.sendTextToUrlSearchBox((row.getCell(j).getStringCellValue()));
-	        		    System.out.println((row.getCell(j).getStringCellValue()));
-	        		    System.out.println(j);
-	        		    
-	        		    //Scroll the pages
-	        		    scrollInTouchActionToTheTop(driver);
-	        		    
-	        		    
-        	     }
+        	        
         	        
         	       // scrollInTouchActionToTheTop(driver);   
         	       sleep(1);
         	       
         	       //Close all the tabs
-        	     //chromeBrowserPage.closeAllTabInBrowser();
+        	     chromeBrowserPage.clearBrowserData();
         	     System.out.println("All tabs clear");
+        	     
+        	    // DisconnectedWifi();
         	     
         	     //Close all Apps
         	     chromeBrowserPage.closeAllApps();

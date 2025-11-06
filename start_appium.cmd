@@ -1,0 +1,3 @@
+@echo off
+echo Starting Appium server on port 4726...
+npx appium -p 4726 --session-override --log-level error

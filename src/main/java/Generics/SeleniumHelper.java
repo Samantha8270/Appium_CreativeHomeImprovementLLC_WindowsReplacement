@@ -6,6 +6,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.testng.Assert.ARRAY_MISMATCH_TEMPLATE;
 import static org.testng.Assert.fail;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -14,12 +16,16 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
@@ -71,14 +77,23 @@ public class SeleniumHelper extends AutomationHelper {
 	public static WebDriver driver;
 	public static WebElement element;
 	private final static PointerInput FINGER = new PointerInput(Kind.TOUCH, "finger");
-	
+	WebElement passwordbox;
    //WebElement = driver.finde
 	public boolean waitForElement(WebElement ele) {
 		WebDriverWait wait = new WebDriverWait(driver,
 				Duration.ofSeconds(Integer.parseInt(Config.configMap.get("globalWaitTime"))));
 		wait.until(ExpectedConditions.visibilityOf(ele));
+		System.out.println("waiting for----"+ele.getText());
 		return true;
 	}
+	public void tap(int x, int y) {
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence tap = new Sequence(finger, 1);
+        tap.addAction(finger.createPointerMove(Duration.ofMillis(0), PointerInput.Origin.viewport(), x, y));
+        tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        ((RemoteWebDriver) driver).perform(Arrays.asList(tap));
+    }
 	
 	public boolean waitForElement(WebElement ele, int timeInSec) {
 		WebDriverWait wait = new WebDriverWait(driver,
@@ -96,6 +111,29 @@ public class SeleniumHelper extends AutomationHelper {
 				"new UiScrollable(new UiSelector().scrollable(true).instance(0)).scrollIntoView(new UiSelector().textContains(\""
 						+ text + "\").instance(0))"));
 	}
+	public  double[] generateRandomLocation(double givenLatitude, double givenLongitude, double distanceInMiles) {
+        Random random = new Random();
+   //sleep(0);
+        // Radius of the Earth in miles
+        double earthRadius = 3958.8;
+
+        // Convert distance from miles to radians
+        double distanceInRadians = distanceInMiles / earthRadius;
+
+        // Generate random angle in radians
+        double randomAngle = random.nextDouble() * 2 * Math.PI;
+
+        // Calculate new latitude and longitude
+        double newLatitude = Math.toDegrees(Math.asin(Math.sin(Math.toRadians(givenLatitude)) * Math.cos(distanceInRadians) +
+                Math.cos(Math.toRadians(givenLatitude)) * Math.sin(distanceInRadians) * Math.cos(randomAngle)));
+
+        double newLongitude = Math.toDegrees(Math.toRadians(givenLongitude) +
+                Math.atan2(Math.sin(randomAngle) * Math.sin(distanceInRadians) * Math.cos(Math.toRadians(givenLatitude)),
+                        Math.cos(distanceInRadians) - Math.sin(Math.toRadians(givenLatitude)) * Math.sin(Math.toRadians(newLatitude))));
+
+        return new double[]{newLatitude, newLongitude};
+    }
+	
 
 	public void toogleFlightMode() {
 		((SupportsNetworkStateManagement) driver).toggleAirplaneMode();
@@ -104,9 +142,111 @@ public class SeleniumHelper extends AutomationHelper {
 		sleep(6);
 		System.out.println("Network Restarting");
 	}
+	WebElement forget;
+	public void connectWifi() {
+		Runtime rt = Runtime.getRuntime();
+		Process pr;
+		  try {
+			pr = rt.exec("adb -s 72266245408994 shell am start -a android.settings.WIFI_SETTINGS");
+			sleep(8);
+			tap(180, 237);
+			try {
+				if(forgetVisible()) {
+					waitForElement(forget);
+					forget.click();
+					System.out.println("wifi is forgotten");
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("forgotten is not display");
+			}
+			sleep(3);
+			tap(294, 811);
+			sleep(4);
+			try {
+				WebElement wifi = driver.findElement(By.xpath("//android.widget.LinearLayout[@content-desc=\"FX3100-0070,Wifi three bars.,Secure network\"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout"));
+				//tap(180, 237);
+				waitForElement(wifi);
+				wifi.click();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
+			sleep(4);
+		     
+			  if(elementIsVisible()) {
+				  //waitForElement(element);
+				  sleep(2);
+				  passwordbox.sendKeys("b40f38bd");
+				  sleep(2);
+				  pressKeyboardKey(AndroidKey.ENTER);
+				  sleep(3);
+				  System.out.println("Connected wifi with password");
+			  }else {}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("nothing");
+		}
+	}
+	public boolean forgetVisible() {
+		try {
+			 forget = driver.findElement(By.xpath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/androidx.recyclerview.widget.RecyclerView/android.widget.LinearLayout[1]/android.widget.Button[1]"));
+		    sleep(2);
+		    return forget.isDisplayed();
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("not display forget button");
+			return false;
+		}
+		
+	}
+	public boolean elementIsVisible(){
+		try {
+			passwordbox = driver.findElement(By.xpath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView[1]/android.widget.LinearLayout/android.widget.LinearLayout[1]/android.widget.LinearLayout[1]/android.widget.EditText"));
+		     System.out.println(passwordbox.getText());
+		     sleep(2);
+		     return passwordbox.isDisplayed();
+		}catch(Exception f) {
+			 System.out.println("Not displayed wifi password box");
+			 return false;
+		 }
+
+	}
+	public void DisconnectedWifi() {
+		Runtime rt = Runtime.getRuntime();
+		Process pr;
+			try {
+				pr = rt.exec("adb -s 72266245408994 shell am start -a android.settings.WIFI_SETTINGS");
+				sleep(8);
+				tap(180, 237);
+				sleep(4);
+				tap(83, 352);
+				System.out.println("Wifi disconnected");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.out.println("not disconnected wifi");
+				e.printStackTrace();
+			}
+			
+	}
 
 	public void pressKeyboardKey(AndroidKey key) {
 		((AndroidDriver) driver).pressKey(new KeyEvent(key));
+	}
+	
+	public void startAppium() {
+		Runtime rt = Runtime.getRuntime(); 
+		Process pr;
+		try {
+			pr = rt.exec("cmd /C start appium server  -p 4723 -a 127.0.0.1 -pa /wd/hub");
+			sleep(8);
+			//int exitValue=pr.exitValue();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
 	}
 
 	public void scrollTillTime(double timeInMinute) {
@@ -147,6 +287,7 @@ public class SeleniumHelper extends AutomationHelper {
 		 }
            
 	   }
+	
 	
 	 public  void scrollForDurationInSeconds(WebDriver driver, int durationInSeconds) {
 	        JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -347,7 +488,7 @@ public class SeleniumHelper extends AutomationHelper {
             // Check if the element with the given text is visible
             try {
                  element = driver.findElement(By.xpath("//android.widget.TextView[@content-desc='"+shopName+"']"));
-                System.out.println(element);
+                System.out.println(element);  // //android.widget.TextView[@content-desc='"+shopName+"']
                 ///sleep(1);
                return element.isDisplayed();     //android.widget.TextView[@content-desc=\"Corporate Video Production\"]
                 //return true;
@@ -455,6 +596,108 @@ public class SeleniumHelper extends AutomationHelper {
         	        }
         	      }
         	    }
+        
+        public static void startAppiumServer() {
+        	 String BATCH_FILE_DIRECTORY = "AppiumFramework/Resources";
+             String BATCH_FILE_NAME = "start_appium2.bat";
+            // Build the Appium start command with custom configurations
+             try {
+                 // Get the project's root directory
+                 String projectRoot = new File("").getAbsolutePath();
+
+                 // Construct the directory path to the batch file
+                 String batchFileDirectory = projectRoot + File.separator + BATCH_FILE_DIRECTORY;
+
+                 // Construct the absolute path to the batch file
+                 String absolutePath = batchFileDirectory + File.separator + BATCH_FILE_NAME;
+
+                 // Build the Appium start command with custom configurations
+                 CommandLine command = new CommandLine("cmd").addArgument("/c").addArgument(absolutePath);
+
+                 // Execute the command
+                 DefaultExecutor executor = new DefaultExecutor();
+                 executor.setWorkingDirectory(new File(batchFileDirectory));
+                 executor.execute(command);
+
+                 System.out.println("Appium server started successfully.");
+             } catch (ExecuteException e) {
+                 e.printStackTrace();
+             } catch (Exception e) {
+                 e.printStackTrace();
+             }
+
+
+        }
+              public void executeCommand(String command) {
+                  try {
+                      // Execute the command
+                      Process process = Runtime.getRuntime().exec(command);
+
+                      // Wait for the command to complete (optional)
+                      int exitCode = process.waitFor();
+
+                      // Print the command output (optional)
+                      // BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                      // String line;
+                      // while ((line = reader.readLine()) != null) {
+                      //     System.out.println(line);
+                      // }
+
+                      // Check if the command was successful
+                      if (exitCode == 0) {
+                          System.out.println("Command executed successfully");
+                      } else {
+                          System.err.println("Error executing command");
+                      }
+                  } catch (IOException | InterruptedException e) {
+                      e.printStackTrace();
+                  }
+            // Execute the command
+//            DefaultExecutor executor = new DefaultExecutor();
+//            try {
+//                executor.execute(command);
+//                System.out.println("Appium server started successfully.");
+//            } catch (ExecuteException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+        }
+              public void executeBatchFile(String batchFilePath) {
+                  try {
+                      // Build the command to execute the batch file
+                      String command = "cmd /c start /wait " + batchFilePath;
+
+                      // Execute the command
+                      Process process = Runtime.getRuntime().exec(command);
+
+                      // Wait for the process to complete
+                      int exitCode = process.waitFor();
+
+                      // Check if the execution was successful
+                      if (exitCode == 0) {
+                          System.out.println("Batch file executed successfully.");
+                      } else {
+                          System.err.println("Error executing batch file.");
+                      }
+                  } catch (IOException | InterruptedException e) {
+                      e.printStackTrace();
+                  }
+              }
+        
+        public  void stopAppiumServer() {
+            // Build the Appium stop command
+        	Runtime rt = Runtime.getRuntime(); 
+    		Process pr;
+    		try {
+    			pr = rt.exec("cmd /C start taskkill /F /IM node.exe");
+    			sleep(5);
+    			//int exitValue=pr.exitValue();
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		} 
+        }
         	    public void scrollForTimeInTouchAction(WebDriver driver,int durationInSeconds) {
         	    	WebElement pageNotFoundLink = driver.findElement(By.xpath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout[1]/android.widget.FrameLayout[2]/android.webkit.WebView/android.view.View/android.view.View[3]/android.widget.TextView"));
         	       
