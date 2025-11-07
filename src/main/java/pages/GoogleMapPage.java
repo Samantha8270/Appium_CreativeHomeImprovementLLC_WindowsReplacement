@@ -98,7 +98,8 @@ public class GoogleMapPage extends BasePage {
 	try {	
 	  if(signBtn.isDisplayed()) {
 		waitForElement(signBtn);
-		//skipbutton.click();
+		signBtn.click();
+		System.out.println("Clicked on ---" + signBtn.getText());
 		tap(417, 66);
 		System.out.println("Clicked on sign by tap in first if method");
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
