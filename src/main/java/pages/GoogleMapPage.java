@@ -40,7 +40,7 @@ public class GoogleMapPage extends BasePage {
 	private WebElement leftArrow;
 	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.widget.ScrollView/android.widget.RelativeLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout[2]/android.widget.FrameLayout/android.widget.FrameLayout/android.support.v7.widget.RecyclerView/android.widget.LinearLayout[2]/android.widget.FrameLayout")
 	private WebElement seeAll;
-	@FindBy(xpath = "//android.widget.LinearLayout[@content-desc=\"Website: https://www.recon-restoration.com/contact-us/\"]")
+	@FindBy(xpath = "//android.widget.LinearLayout[@content-desc=\"Website: http://www.creativehomeimprovementllc.com/\"]")
 	private WebElement shopUrl;
 	@FindBy(xpath = "//android.view.View[@content-desc=\"Get an Estimate\"]/android.widget.TextView")
 	private WebElement estimateBtn;
@@ -364,7 +364,7 @@ public class GoogleMapPage extends BasePage {
 	}
 	public boolean shopUrlIsVisible() {
 	 try {
-		element = driver.findElement(By.xpath("//android.widget.LinearLayout[@content-desc=\"Website: https://www.recon-restoration.com/contact-us/\"]"));
+		element = driver.findElement(By.xpath("//android.widget.LinearLayout[@content-desc=\"Website: http://www.creativehomeimprovementllc.com/\"]"));
 		 System.out.println(element);
          sleep(1);
         return element.isDisplayed();     //android.widget.TextView[@content-desc=\"Corporate Video Production\"]
