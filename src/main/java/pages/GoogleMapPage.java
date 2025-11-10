@@ -32,7 +32,7 @@ public class GoogleMapPage extends BasePage {
     private WebElement signBtn;
 	@FindBy(xpath = "//android.widget.EditText[@content-desc=\"Search here\"]/android.widget.TextView")
 	private WebElement textBox;
-	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.widget.FrameLayout[2]/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.EditText/android.widget.EditText")
+	@FindBy(xpath = "//android.widget.EditText[@resource-id=\"com.google.android.apps.maps:id/search_omnibox_edit_text\"]")
 	private WebElement searchBox;
 	@FindBy(xpath = "//android.widget.FrameLayout[@content-desc=\"Sign in\"]/android.widget.FrameLayout/android.widget.ImageView")
 	private WebElement sign;
