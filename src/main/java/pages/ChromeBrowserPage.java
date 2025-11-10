@@ -76,14 +76,14 @@ public class ChromeBrowserPage extends BasePage {
 	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.Button")
 	private WebElement closeAllAppsBtn;
 	
-	@FindBy(xpath = "//android.widget.ImageButton[@content-desc=\"Switch or close tabs\"]")
+	@FindBy(xpath = "//android.widget.ImageButton[@content-desc=\"Customize and control Google Chrome\"]")
 	private WebElement openTabsBtn;
 	
-	@FindBy(xpath = "//android.widget.ImageButton[@content-desc=\"Customize and control Google Chrome\"]")
-	private WebElement openTabOption;
+	@FindBy(xpath = "//android.widget.TextView[@resource-id=\"com.android.chrome:id/menu_item_text\" and @text=\"Delete browsing data\"]")
+	private WebElement deleteBrowserData;
 	
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"Close all tabs\"]")
-	private WebElement closeAllTabBtn;
+	@FindBy(xpath = "//android.widget.Button[@resource-id=\"com.android.chrome:id/positive_button\"]")
+	private WebElement deleteData;
 
 	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.view.ViewGroup/android.widget.Button[2]")
 	private WebElement closedTab;
@@ -214,12 +214,33 @@ public class ChromeBrowserPage extends BasePage {
 		waitForElement(openTabsBtn);
 		openTabsBtn.click();
 		sleep(3);
-		waitForElement(openTabOption);
-		openTabOption.click();
-		waitForElement(closeAllTabBtn);
-		closeAllTabBtn.click();
-		waitForElement(closedTab);
-		closedTab.click();
+		waitForElement(deleteBrowserData);
+		deleteBrowserData.click();
+		waitForElement(deleteData);
+		deleteData.click();
+//		waitForElement(closedTab);
+//		closedTab.click();
+	}
+	public static void clearRecentApps(String udid) {
+	    try {
+	        // Open recent apps screen
+	        Runtime.getRuntime().exec("adb -s " + udid + " shell input keyevent KEYCODE_APP_SWITCH");
+
+	        // Wait for the recent apps to open
+	        Thread.sleep(1500);
+
+	        // Swipe up to clear all recent apps
+	        Runtime.getRuntime().exec("adb -s " + udid + " shell input swipe 500 1000 500 100");
+
+	        // Wait and return to the home screen
+	        Thread.sleep(1000);
+	        Runtime.getRuntime().exec("adb -s " + udid + " shell input keyevent 3");
+
+	        System.out.println("✅ Recent apps cleared successfully on device: " + udid);
+	    } catch (Exception e) {
+	        System.err.println("❌ Failed to clear recent apps on device: " + udid);
+	        e.printStackTrace();
+	    }
 	}
 	public void clearBrowserData() {
 		sleep(2);

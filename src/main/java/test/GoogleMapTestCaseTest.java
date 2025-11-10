@@ -156,6 +156,8 @@ public class GoogleMapTestCaseTest extends BaseTest {
 //    	        		    
 //    	        		    //Scroll the pages
     	        		    scrollInTouchActionToTheTop(driver);
+    	        		    chromeBrowserPage.closeAllTabInBrowser();
+    	           	     System.out.println("All tabs clear");
 //    	        		    
 //    	        		    
             	     }
@@ -170,13 +172,12 @@ public class GoogleMapTestCaseTest extends BaseTest {
         	       sleep(1);
         	       
         	       //Close all the tabs
-        	     chromeBrowserPage.clearBrowserData();
-        	     System.out.println("All tabs clear");
+        	     
         	     
         	    // DisconnectedWifi();
         	     
         	     //Close all Apps
-        	     chromeBrowserPage.closeAllApps();
+        	     chromeBrowserPage.clearRecentApps(udid);
         	     System.out.println("Closed all app");
         	     
         	     
